@@ -1,4 +1,4 @@
-Repository activity graph generator and host plugin for SpecLog
+SpecLog test status provider for Gherkin tests run by Jenkins/Hudson
 Copyright (C) 2014  Mátyás Kabódi <quexy@freemail.hu>
 
 This program is free software: you can redistribute it and/or modify
