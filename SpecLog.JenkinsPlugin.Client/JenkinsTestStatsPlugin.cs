@@ -34,7 +34,7 @@ namespace SpecLog.JenkinsPlugin.Client
 
         public string Description { get { return "Client side plugin to store and display Jenkins test statistics for linked Gherkin files"; } }
 
-        public string LearnMoreLink { get { return "http://github.com/quexy/SpecLog.JenkinsTestStats/wiki/"; } }
+        public string LearnMoreLink { get { return "https://github.com/quexy/SpecLog.JenkinsPlugin/wiki"; } }
 
         public string LearnMoreLinkText { get { return "Learn more..."; } }
 
