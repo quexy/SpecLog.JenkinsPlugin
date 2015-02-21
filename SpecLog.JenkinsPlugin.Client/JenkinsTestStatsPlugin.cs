@@ -40,7 +40,7 @@ namespace SpecLog.JenkinsPlugin.Client
 
         public string LearnMoreLinkText { get { return LearnMoreText; } }
 
-        public string WorkItemProviderName { get { throw new NotImplementedException(); } }
+        public string WorkItemProviderName { get { throw new NotSupportedException(); } }
 
         public bool IsConfigurable(RepositoryMode repositoryMode) { return true; }
 
