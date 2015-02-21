@@ -11,7 +11,7 @@ namespace SpecLog.JenkinsPlugin.Client
     {
         private readonly IDialogService dialogService;
         public JenkinsPluginConfigurationDialogViewModel(IDialogService dialogService, string configuration, bool isEnabled)
-            : base(configuration, isEnabled)
+            : base(configuration, isEnabled, JenkinsTestStatsPlugin.LearnMoreText, JenkinsTestStatsPlugin.LearnMoreUrl)
         {
             this.dialogService = dialogService;
             ChangeUserCommand = new DelegateCommand(ChangeUser);

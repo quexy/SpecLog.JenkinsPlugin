@@ -17,6 +17,8 @@ namespace SpecLog.JenkinsPlugin.Client
     public class JenkinsTestStatsPlugin : IClientPlugin, ICommandableStatsPlugin, IConfigurationSavedCallback
     {
         public const string PluginName = "SpecLog.JenkinsPlugin";
+        public const string LearnMoreText = "Learn more...";
+        public const string LearnMoreUrl = "https://github.com/quexy/SpecLog.JenkinsPlugin/wiki";
 
         private readonly ILogger logger;
         private readonly ITimeService timeService;
@@ -34,9 +36,11 @@ namespace SpecLog.JenkinsPlugin.Client
 
         public string Description { get { return "Client side plugin to store and display Jenkins test statistics for linked Gherkin files"; } }
 
-        public string LearnMoreLink { get { return "https://github.com/quexy/SpecLog.JenkinsPlugin/wiki"; } }
+        public string LearnMoreLink { get { return LearnMoreUrl; } }
 
-        public string LearnMoreLinkText { get { return "Learn more..."; } }
+        public string LearnMoreLinkText { get { return LearnMoreText; } }
+
+        public string WorkItemProviderName { get { throw new NotImplementedException(); } }
 
         public bool IsConfigurable(RepositoryMode repositoryMode) { return true; }
 
