@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TechTalk.SpecFlow;
 using TechTalk.SpecLog.Application.Common.PluginsInfrastructure;
+using TechTalk.SpecLog.Commands.Synchronization.GherkinStats;
 using TechTalk.SpecLog.Common;
 using TechTalk.SpecLog.Entities;
 using TechTalk.SpecLog.Logging;
@@ -32,7 +33,7 @@ namespace SpecLog.JenkinsPlugin.Client
         public AggregateTestStatus GetFeatureStatus(string featureTitle)
         {
             return statsRepository.GetScenarioHistory(featureTitle.AsFeatureId(), string.Empty, true)
-                .Where(s => s.LastResult != TechTalk.SpecLog.Entities.TestResult.Unknown)
+                .Where(s => s.LastResult != TestResult.Unknown)
                 .Select(s => AggregateTestStatusMethods.ConvertStatus(s.LastResult))
                 .Aggregate(AggregateTestStatus.NoInformation, AggregateTestStatusMethods.CombineStatus);
         }

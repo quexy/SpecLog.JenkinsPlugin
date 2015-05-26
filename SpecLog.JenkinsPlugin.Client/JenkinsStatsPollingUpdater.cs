@@ -7,12 +7,6 @@ using Newtonsoft.Json;
 using TechTalk.SpecLog.Common;
 using TechTalk.SpecLog.Entities;
 using TechTalk.SpecLog.Logging;
-//for UpdateStatisticsHack()
-using System.Reflection;
-using TechTalk.SpecLog.DataAccess.Boundaries;
-using TechTalk.SpecLog.DataAccess.Repositories;
-using StatsEntity = TechTalk.SpecLog.Entities.GherkinScenarioStatistics;
-using StatsDict = System.Collections.Generic.Dictionary<System.Guid, TechTalk.SpecLog.Entities.GherkinScenarioStatistics>;
 
 namespace SpecLog.JenkinsPlugin.Client
 {
@@ -36,17 +30,17 @@ namespace SpecLog.JenkinsPlugin.Client
 
         public override bool TriggerUpdate()
         {
-            return UpdateSince(statsRepository.LastStatsDate);
+            return UpdateSince(statsRepository.LastRetrievedAt);
         }
 
         public bool UpdateSince(DateTime? lastDate)
         {
             try
             {
+                var queryTime = timeService.CurrentTime;
                 var testStats = GetTestResults(pluginConfiguration, lastDate)
                     .Select(TestCaseToScenarioStatsConverter.Convert).ToArray();
-                //HACK: error in 'statsRepository.UpdateStatistics(testStats)' implementation
-                UpdateStatisticsHack(statsRepository, testStats);
+                statsRepository.UpdateStatistics(testStats, queryTime);
                 return true;
             }
             catch (Exception ex)
@@ -54,53 +48,6 @@ namespace SpecLog.JenkinsPlugin.Client
                 logger.Log(TraceEventType.Error, "Could not update test run statistics: {0}", ex);
                 return false;
             }
-        }
-
-        private static void UpdateStatisticsHack(IGherkinStatsRepository statsRepo, IGherkinScenarioStatistics[] testStats)
-        {
-            if (testStats.Length == 0) return;
-
-            var fieldFlags = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField;
-            var methodFlags = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod;
-            var mainBoundary = (IBoundary)typeof(GherkinStatsRepository).GetField("mainBoundary", fieldFlags).GetValue(statsRepo);
-            var boundaryFactory = (IBoundaryFactory)typeof(GherkinStatsRepository).GetField("boundaryFactory", fieldFlags).GetValue(statsRepo);
-            var statsCache = (StatsDict)typeof(GherkinStatsRepository).GetField("statsCollection", fieldFlags).GetValue(statsRepo);
-            var repoStore = (IRepositoryStorage)typeof(GherkinStatsRepository).GetField("repositoryStorage", fieldFlags).GetValue(statsRepo);
-
-            var statsMethod = typeof(GherkinStatsRepository).GetMethod("GetAffectedRequierements", methodFlags);
-            Func<object, Guid[]> statsIds = group => (Guid[])statsMethod.Invoke(statsRepo, new object[] { group });
-            var changedIds = testStats.GroupBy(s => s.FeatureTitle).SelectMany(statsIds).Distinct().ToArray();
-
-            using (var boundary = boundaryFactory.CreateShortRunning(mainBoundary))
-            {
-                foreach (var stat in testStats)
-                {
-                    StatsEntity statsEntity = null;
-                    if (!statsCache.TryGetValue(stat.ScenarioId, out statsEntity))
-                    {
-                        statsEntity = repoStore.Create<StatsEntity>(boundary);
-                        boundary.Complete();
-                    }
-
-                    statsEntity = boundary.AttachObject(statsEntity);
-                    statsEntity.PluginName = JenkinsTestStatsPlugin.PluginName;
-                    statsEntity.ScenarioId = stat.ScenarioId;
-                    statsEntity.ScenarioTitle = stat.ScenarioTitle;
-                    statsEntity.FeatureTitle = stat.FeatureTitle;
-                    statsEntity.LastRunDate = stat.LastRunDate;
-                    statsEntity.LastResult = stat.LastResult;
-                    statsEntity.HistoricalResult = stat.HistoricalResult;
-                    boundary.Complete();
-
-                    statsCache[stat.ScenarioId] = mainBoundary.AttachObject(statsEntity);
-                }
-            }
-
-            typeof(GherkinStatsRepository).GetMethod("OnStatisticsUpdated", methodFlags)
-                .Invoke(statsRepo, new object[] { EventArgs.Empty });
-
-            typeof(GherkinStatsRepository).GetMethod("OnRequirementStatisticsChanged", methodFlags)
-                .Invoke(statsRepo, new object[] { changedIds });
         }
 
         public static IEnumerable<TestCase> GetTestResults(IJenkinsStatsPluginConfiguration config, DateTime? since)

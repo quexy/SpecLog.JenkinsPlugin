@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using TechTalk.SpecLog.Entities;
+using TechTalk.SpecLog.Commands.Synchronization.GherkinStats;
 
 namespace SpecLog.JenkinsPlugin.Client
 {
@@ -10,7 +10,7 @@ namespace SpecLog.JenkinsPlugin.Client
         static readonly ByteConverter converter = new ByteConverter();
         public static IGherkinScenarioStatistics Convert(this TestCase testCase)
         {
-            var result = new GherkinScenarioStatistics();
+            var result = new GherkinScenarioStatisticsData();
             result.ScenarioId = new Guid(GetGuidBytes(testCase));
             result.ScenarioTitle = testCase.name;
             result.FeatureTitle = testCase.classOnly;
@@ -68,21 +68,6 @@ namespace SpecLog.JenkinsPlugin.Client
                 default:
                     return HistoricalTestResult.Unknown;
             }
-        }
-
-        class GherkinScenarioStatistics : IGherkinScenarioStatistics
-        {
-            public Guid ScenarioId { get; set; }
-
-            public string ScenarioTitle { get; set; }
-
-            public string FeatureTitle { get; set; }
-
-            public HistoricalTestResult HistoricalResult { get; set; }
-
-            public TestResult LastResult { get; set; }
-
-            public DateTime LastRunDate { get; set; }
         }
     }
 }
