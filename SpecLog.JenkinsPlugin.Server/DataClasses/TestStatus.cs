@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SpecLog.JenkinsPlugin.Client
+namespace SpecLog.JenkinsPlugin.Server
 {
     enum TestStatus
     {

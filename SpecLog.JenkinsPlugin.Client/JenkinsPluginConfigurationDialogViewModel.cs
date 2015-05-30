@@ -68,14 +68,14 @@ namespace SpecLog.JenkinsPlugin.Client
             if (changeResult == null) return;
 
             configuration.Username = changeResult.Username;
-            configuration.Password = CryptoService.Encrypt(changeResult.Password);
+            sensitiveConfig["JenkinsPassword"] = changeResult.Password;
             base.NotifyPropertyChanged("DisplayedUser");
         }
 
         void ClearUser()
         {
             configuration.Username = null;
-            configuration.Password = null;
+            sensitiveConfig.Remove("JenkinsPassword"); ;
             base.NotifyPropertyChanged("DisplayedUser");
         }
 

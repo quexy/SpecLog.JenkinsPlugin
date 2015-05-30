@@ -8,9 +8,9 @@ using TechTalk.SpecLog.Common;
 using TechTalk.SpecLog.Entities;
 using TechTalk.SpecLog.Logging;
 
-namespace SpecLog.JenkinsPlugin.Client
+namespace SpecLog.JenkinsPlugin.Server
 {
-    class JenkinsStatsPollingUpdater : PollingSynchronizer
+    public class JenkinsStatsPollingUpdater : PollingSynchronizer
     {
         private readonly ILogger logger;
         private readonly IGherkinStatsRepository statsRepository;
@@ -50,9 +50,9 @@ namespace SpecLog.JenkinsPlugin.Client
             }
         }
 
-        public static IEnumerable<TestCase> GetTestResults(IJenkinsStatsPluginConfiguration config, DateTime? since)
+        private static IEnumerable<TestCase> GetTestResults(IJenkinsStatsPluginConfiguration config, DateTime? since)
         {
-            var password = CryptoService.Decrypt(config.Password);
+            var password = config.Password;
             var auth = string.IsNullOrEmpty(config.Username) ? null : new NetworkCredential(config.Username, password);
             var projectRoot = new Uri(config.JenkinsRoot.TrimEnd('/') + "/job/" + config.ProjectName.Trim('/') + "/");
             return GetObject<BuildList>(projectRoot, "api/json", auth).builds.OrderByDescending(b => b.number)

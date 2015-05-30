@@ -4,8 +4,17 @@ using TechTalk.SpecLog.Common;
 
 namespace SpecLog.JenkinsPlugin
 {
+    public interface IJenkinsStatsPluginConfiguration : IPollingSynchronizerConfiguration
+    {
+        string JenkinsRoot { get; }
+        string ProjectName { get; }
+
+        string Username { get; }
+        string Password { get; }
+    }
+
     [Serializable]
-    public class JenkinsStatsPluginConfiguration
+    public class JenkinsStatsPluginConfiguration : IJenkinsStatsPluginConfiguration
     {
         public JenkinsStatsPluginConfiguration()
         {
@@ -17,6 +26,9 @@ namespace SpecLog.JenkinsPlugin
         public string ProjectName { get; set; }
 
         public string Username { get; set; }
+
+        [XmlIgnore]
+        public string Password { get; set; }
 
         public int UpdateIntervalMinutes { get; set; }
 

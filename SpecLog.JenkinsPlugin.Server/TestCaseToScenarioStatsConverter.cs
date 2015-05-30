@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using TechTalk.SpecLog.Commands.Synchronization.GherkinStats;
 
-namespace SpecLog.JenkinsPlugin.Client
+namespace SpecLog.JenkinsPlugin.Server
 {
     static class TestCaseToScenarioStatsConverter
     {

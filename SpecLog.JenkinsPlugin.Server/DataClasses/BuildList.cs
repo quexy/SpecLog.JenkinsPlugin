@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SpecLog.JenkinsPlugin.Client
+namespace SpecLog.JenkinsPlugin.Server
 {
     class BuildList
     {
